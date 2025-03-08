@@ -15,7 +15,7 @@ if (!process.env.MONGO_URI) {
 
 // app config
 const app = express()
-const port = 4000; // Define the port for the server
+const port = 3000; // Define the port for the server
 
 // middleware
 app.use(express.json())
