@@ -2,7 +2,11 @@ import foodModel from '../models/foodModel.js'
 import fs from 'fs'
 
 // add food item
-const addFood = async (req,res) => {
+const addFood = async (req, res) => {
+    if (!req.body.name || !req.body.price || !req.file) {
+        return res.status(400).json({ success: false, message: "Name, price, and image are required." });
+    }
+    
     let image_filename = `${req.file.filename}`;
 
     const food = new foodModel({
@@ -15,35 +19,38 @@ const addFood = async (req,res) => {
 
     try {
         await food.save();
-        res.json({success:true,message:"Food item added successfully."})
+        res.json({ success: true, message: "Food item added successfully." });
     } catch (error) {
-        console.log(error)
-        res.json({success:false,message:"An error occurred while adding the food item."})
+        console.log(error);
+        res.json({ success: false, message: "An error occurred while adding the food item." });
     }
 }
 
 // all food list
-const listFood = async (req,res) => {
+const listFood = async (req, res) => {
     try {
         const foods = await foodModel.find({});
-        res.json({success:true,data:foods})
+        res.json({ success: true, data: foods });
     } catch (error) {
         console.log(error);
-        res.json({success:false,message:"An error occurred while listing food items."})
+        res.json({ success: false, message: "An error occurred while listing food items." });
     }
 }
 
 // remove food item
-const removeFood = async (req,res) => {
+const removeFood = async (req, res) => {
     try {
         const food = await foodModel.findById(req.body.id);
-        fs.unlink(`uploads/${food.image}`,()=>{})
-
-        await foodModel.findByIdAndDelete(req.body.id);
-        res.json({success:true,message:"Food Removed"})
+        if (food) {
+            fs.unlink(`uploads/${food.image}`, () => {});
+            await foodModel.findByIdAndDelete(req.body.id);
+            res.json({ success: true, message: "Food Removed" });
+        } else {
+            res.status(404).json({ success: false, message: "Food item not found." });
+        }
     } catch (error) {
         console.log(error);
-        res.json({success:false,message:"An error occurred while deleting the food item."})
+        res.json({ success: false, message: "An error occurred while deleting the food item." });
     }
 }
 
