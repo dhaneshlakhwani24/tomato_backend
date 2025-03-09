@@ -2,6 +2,7 @@ import userModel from "../models/userModel.js";
 
 // Register a new user
 const registerUser = async (req, res) => {
+    console.log("Incoming registration request:", req.body); // Log incoming request data
     const { name, email, password } = req.body;
 
     if (!name || !email || !password) {
@@ -10,6 +11,7 @@ const registerUser = async (req, res) => {
 
     try {
         const newUser = new userModel({ name, email, password });
+        console.log("New user created:", newUser); // Log the new user object
         await newUser.save();
         res.json({ success: true, message: "User registered successfully." });
     } catch (error) {
